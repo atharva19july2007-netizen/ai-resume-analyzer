@@ -1,3 +1,5 @@
 streamlit
 pdfplumber
-ollama
+groq
+re
+python-dotenv

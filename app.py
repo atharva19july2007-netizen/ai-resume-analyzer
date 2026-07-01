@@ -1,7 +1,13 @@
 import streamlit as st
 import pdfplumber
-import ollama
+from groq import Groq
 import re
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 st.markdown("""
 <style>
@@ -125,12 +131,12 @@ if uploaded_file is not None:
         status.text("Generating improvement suggestions...")
         progress.progress(80)
 
-        response = ollama.chat(model='llama3', messages=[{'role': 'user', 'content': prompt}])
+        response = client.chat.completions.create(model="llama-3.3-70b-versatile", messages=[{"role": "user", "content": prompt}])
 
         progress.progress(100)
         status.text("Review complete.")
         st.subheader("General Resume Review")
-        response_text = response['message']['content']
+        response_text = response.choices[0].message.content
         st.markdown(response_text)
 
     with col2:
@@ -182,14 +188,12 @@ if uploaded_file is not None:
             status.text("Generating recommendations...")
             progress.progress(80)
 
-            response = ollama.chat(
-                model='llama3',
-                messages=[{'role': 'user', 'content': prompt}])
+            response = client.chat.completions.create(model="llama-3.3-70b-versatile", messages=[{"role": "user", "content": prompt}])
 
             progress.progress(100)
             status.text("Analysis complete.")
             st.subheader("ATS Analysis")
-            response_text = response['message']['content']
+            response_text = response.choices[0].message.content
             match = re.search(r'ATS Score:\s*(\d+)', response_text)
 
             if match:
@@ -223,18 +227,13 @@ if st.button("Rewrite Bullet Point"):
 
     with st.spinner("Rewriting bullet point..."):
 
-        rewrite_response = ollama.chat(
-            model='llama3',
-            messages=[
-                {
-                    'role': 'user',
-                    'content': rewrite_prompt
-                }
-            ]
+        rewrite_response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[{"role": "user", "content": rewrite_prompt}]
         )
 
         st.success("Improved Resume Bullet")
 
         st.markdown(
-            rewrite_response['message']['content']
+            rewrite_response.choices[0].message.content
         )

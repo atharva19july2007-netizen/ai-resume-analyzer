@@ -30,7 +30,7 @@ AI-powered resume analyzer built with Streamlit, Ollama, and Llama3.
 
 \- Streamlit
 
-\- Ollama
+\- Groq
 
 \- Llama3
 
